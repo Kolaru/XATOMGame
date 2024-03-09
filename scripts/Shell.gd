@@ -9,7 +9,9 @@ var bound_electrons = []
 var shell = "1s"
 var speed = 3
 
-onready var base_color = $Shell.material.albedo_color
+var is_selected = false
+var selected_electron
+
 onready var Electron = preload("res://scenes/Electron.tscn")
 
 signal selected(shell)
@@ -17,6 +19,7 @@ signal deselected(shell)
 
 func _ready():
 	$Shell.radius = radius
+	$SelectedShell.radius = radius
 	
 	for el in range(n_el):
 		var new_el = Electron.instance()
@@ -30,23 +33,54 @@ func _ready():
 		
 		add_child(new_el)
 		
-		new_el.connect("hovered", self, "select")
-		new_el.connect("unhovered", self, "deselect")
+		new_el.connect("hovered", self, "_on_hovered")
+		new_el.connect("unhovered", self, "_on_unhovered")
+		new_el.connect("clicked", self, "_on_clicked")
 		bound_electrons.push_back(new_el)
 
 func _process(_dt):
 	pass
 	
-func select(from_electron):
+func _unhandled_input(event):
+	if event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
+		is_selected = false
+		deselect_electron()
+		deselect()
+	
+func _on_hovered(from_electron):
+	select()
+	
+func _on_unhovered(from_electron):
+	if not is_selected:
+		deselect()
+	
+func _on_clicked(from_electron):
+	is_selected = true
+	select_electron(from_electron)
+	select()
+	
+func select_electron(electron):
+	if selected_electron:
+		selected_electron.toggle_outline(false)
+	selected_electron = electron
+	electron.toggle_outline(true)
+
+func deselect_electron():
+	if selected_electron:
+		selected_electron.toggle_outline(false)
+
+func select():
 	for electron in bound_electrons:
 		electron.speed = 0
 		
-	$Shell.material.albedo_color = Color(1, 1, 1, 0.3)
+	$Shell.visible = false
+	$SelectedShell.visible = true
 	emit_signal("selected", self)
 	
-func deselect(from_electron):
+func deselect():
 	for electron in bound_electrons:
 		electron.speed = electron.orbit_speed
 		
-	$Shell.material.albedo_color = base_color
+	$Shell.visible = true
+	$SelectedShell.visible = false
 	emit_signal("deselected", self)

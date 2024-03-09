@@ -27,8 +27,6 @@ func _process(dt):
 	if state == "bound":
 		phi += dt * speed / orbit_radius
 		translation = orbit_radius * Vector3(cos(phi), 0, sin(phi))
-		$Trace.draw_pass_1.radius = radius * 0.6
-		$Trace.draw_pass_1.height = 2*$Trace.draw_pass_1.radius
 	elif state == "free":
 		pass
 
@@ -38,16 +36,14 @@ func _input_event(camera, event, click_position, click_normal, shape_idx):
 
 func _on_mouse_entered():
 	emit_signal("hovered", self)
-	toggle_outline(true)
 	
 func _on_mouse_exited():
 	emit_signal("unhovered", self)
-	toggle_outline(false)
 
 func toggle_outline(value):
 	material.next_pass.set_shader_param("enable", value)
-	$Trace.draw_pass_1.material.next_pass.set_shader_param("enable", value)
 
 func _on_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	if event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
-		print("Clicked")
+		emit_signal("clicked", self)
+		get_tree().set_input_as_handled()
