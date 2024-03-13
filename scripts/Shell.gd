@@ -4,10 +4,10 @@ export var radius = 4.0
 export var thickness = 0.1
 export var n_el = 2
 
-var electron_size = 0.4
+var electron_size = 0.8
 var bound_electrons = []
 var shell = "1s"
-var speed = 3
+var speed = 4
 
 var is_selected = false
 var selected_electron

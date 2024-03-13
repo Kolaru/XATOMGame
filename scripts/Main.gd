@@ -1,8 +1,11 @@
 extends Spatial
 
 var structure_path = "res://data/structure/iodine.dat"
+var farfield = 100
 
 onready var Orbit = preload("res://scenes/Shell.tscn")
+
+var selected_shell
 
 func new_orbit(data):
 	var Etot = -float(data[3])
@@ -36,7 +39,19 @@ func _ready():
 		new_orbit(line)
 
 func select_shell(shell):
+	selected_shell = shell
 	$Info/Shell.text = "Shell " + shell.shell + " selected"
+	$Info/ShootButton.visible = true
 	
 func deselect_shell(shell):
 	$Info/Shell.text = "No shell selected"
+	$Info/ShootButton.visible = false
+
+func _on_shoot_button_pressed():
+	var target = selected_shell.selected_electron.global_translation
+	
+	$Photon.global_translation = target
+	$Photon/AnimationPlayer.play("Shoot")
+
+	# $LightRay/AnimationPlayer.play("Pulse")
+	# $LightRay.global_translation = selected_shell.selected_electron.global_translation
