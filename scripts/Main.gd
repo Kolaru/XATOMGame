@@ -48,9 +48,9 @@ func deselect_shell(shell):
 	$Info/ShootButton.visible = false
 
 func _on_shoot_button_pressed():
-	var target = selected_shell.selected_electron.global_translation
+	var target = selected_shell.selected_electron.translation
 	
-	$Photon.global_translation = target
+	$Photon.translation = selected_shell.to_global(target)
 	$Photon/AnimationPlayer.play("Shoot")
 
 	# $LightRay/AnimationPlayer.play("Pulse")
