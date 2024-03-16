@@ -66,3 +66,4 @@ func _on_shoot_button_pressed():
 	
 	$Photon.translation = selected_shell.to_global(target)
 	$Photon/AnimationPlayer.play("Shoot")
+	
