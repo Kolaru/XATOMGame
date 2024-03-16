@@ -9,13 +9,14 @@ var bound_electrons = []
 var shell = "1s"
 var speed = 4
 
-var is_selected = false
+enum State {IDLE, HOVERED, SELECTED}
+var state = State.IDLE
 var selected_electron
 
 onready var Electron = preload("res://scenes/Electron.tscn")
 
-signal selected(shell)
-signal deselected(shell)
+signal toggle_selection(shell, toggle)
+signal toggle_highlight(shell, toggle)
 
 func _ready():
 	$Shell.radius = radius
@@ -41,23 +42,30 @@ func _ready():
 func _process(_dt):
 	pass
 	
+func _on_clicked(from_electron):
+	state = State.SELECTED
+	select_electron(from_electron)
+	highlight()
+	emit_signal("toggle_selection", self, true)
+	
 func _unhandled_input(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
-		is_selected = false
+		state = State.IDLE
 		deselect_electron()
-		deselect()
+		dehighlight()
+		emit_signal("toggle_selection", self, false)
 	
 func _on_hovered(from_electron):
-	select()
+	if state == State.IDLE:
+		state = State.HOVERED
+		highlight()
+		emit_signal("toggle_highlight", self, true)
 	
 func _on_unhovered(from_electron):
-	if not is_selected:
-		deselect()
-	
-func _on_clicked(from_electron):
-	is_selected = true
-	select_electron(from_electron)
-	select()
+	if state == State.HOVERED && state != State.SELECTED:
+		state = State.IDLE
+		dehighlight()
+		emit_signal("toggle_highlight", self, false)
 	
 func select_electron(electron):
 	if selected_electron:
@@ -69,18 +77,16 @@ func deselect_electron():
 	if selected_electron:
 		selected_electron.toggle_outline(false)
 
-func select():
+func highlight():
 	for electron in bound_electrons:
 		electron.speed = 0
 		
 	$Shell.visible = false
 	$SelectedShell.visible = true
-	emit_signal("selected", self)
 	
-func deselect():
+func dehighlight():
 	for electron in bound_electrons:
 		electron.speed = electron.orbit_speed
 		
 	$Shell.visible = true
 	$SelectedShell.visible = false
-	emit_signal("deselected", self)

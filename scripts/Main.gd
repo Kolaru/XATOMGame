@@ -6,6 +6,7 @@ var farfield = 100
 onready var Orbit = preload("res://scenes/Shell.tscn")
 
 var selected_shell
+var displayed_shell
 
 func new_orbit(data):
 	var Etot = -float(data[3])
@@ -27,8 +28,8 @@ func new_orbit(data):
 	
 	add_child(orbit)
 	
-	orbit.connect("selected", self, "select_shell")
-	orbit.connect("deselected", self, "deselect_shell")
+	orbit.connect("toggle_selection", self, "toggle_shell_selection")
+	orbit.connect("toggle_highlight", self, "toggle_shell_display")
 
 func _ready():
 	var structure_file = File.new()
@@ -38,20 +39,30 @@ func _ready():
 		var line = structure_file.get_csv_line()
 		new_orbit(line)
 
-func select_shell(shell):
-	selected_shell = shell
-	$Info/Shell.text = "Shell " + shell.shell + " selected"
-	$Info/ShootButton.visible = true
+func toggle_shell_selection(shell, toggle):
+	if toggle:
+		selected_shell = shell
+	else:
+		selected_shell = null
+		
+	toggle_shell_display(selected_shell, toggle)
+
+func toggle_shell_display(shell, toggle):
+	if toggle:
+		displayed_shell = shell
+	else:
+		displayed_shell = null
+		shell = selected_shell
 	
-func deselect_shell(shell):
-	$Info/Shell.text = "No shell selected"
-	$Info/ShootButton.visible = false
+	if displayed_shell == null and selected_shell == null:
+		$Info/Shell.text = "No shell selected"
+		$Info/ShootButton.visible = false
+	else:
+		$Info/Shell.text = "Shell " + shell.shell + " selected"
+		$Info/ShootButton.visible = true
 
 func _on_shoot_button_pressed():
 	var target = selected_shell.selected_electron.translation
 	
 	$Photon.translation = selected_shell.to_global(target)
 	$Photon/AnimationPlayer.play("Shoot")
-
-	# $LightRay/AnimationPlayer.play("Pulse")
-	# $LightRay.global_translation = selected_shell.selected_electron.global_translation
