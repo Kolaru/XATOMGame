@@ -22,9 +22,12 @@ func new_orbit(data):
 	
 	var theta = rand_range(0, 2*PI)
 	var phi = rand_range(0, 2*PI)
-	
-	orbit.rotate(Vector3(0, 0, 1), theta)
-	orbit.rotate(Vector3(0, 1, 0), phi)
+	orbit.rotation_axis = Vector3(
+		cos(theta) * cos(phi),
+		cos(theta) * sin(phi),
+		sin(theta)
+	)
+	orbit.rotation = Vector3(theta, phi, 0)
 	
 	add_child(orbit)
 	

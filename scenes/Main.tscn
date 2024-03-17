@@ -172,7 +172,7 @@ omni_range = 58.475
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Photon"]
 root_node = NodePath("../Cylinder")
-playback_speed = 1.46
+playback_speed = 0.17
 anims/RESET = SubResource( 3 )
 anims/Shoot = SubResource( 4 )
 

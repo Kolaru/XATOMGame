@@ -4,7 +4,8 @@ export var radius = 4.0
 export var thickness = 0.1
 export var n_el = 2
 
-var electron_size = 0.8
+var rotation_axis = Vector3(0, 1, 0)
+var electron_size = 0.6
 var bound_electrons = []
 var shell = "1s"
 var speed = 4
@@ -14,6 +15,7 @@ var state = State.IDLE
 var selected_electron
 
 onready var Electron = preload("res://scenes/Electron.tscn")
+onready var Hole = preload("res://scenes/Hole.tscn")
 
 signal toggle_selection(shell, toggle)
 signal toggle_highlight(shell, toggle)
@@ -23,15 +25,12 @@ func _ready():
 	$SelectedShell.radius = radius
 	
 	for el in range(n_el):
-		var new_el = Electron.instance()
 		var phi = el * 2*PI / n_el
+		var new_el = Electron.instance()
 		
-		new_el.radius = electron_size / 2
-		new_el.phi = phi
-		new_el.orbit_radius = radius
-		new_el.orbit_speed = speed
-		new_el.shell = shell
-		
+		# new_el.translation = Vector3(radius, 0, 0).rotated(rotation_axis, phi)
+		new_el.translation = radius * Vector3(cos(phi), 0, sin(phi))
+		new_el.radius = electron_size
 		add_child(new_el)
 		
 		new_el.connect("hovered", self, "_on_hovered")
@@ -39,9 +38,11 @@ func _ready():
 		new_el.connect("clicked", self, "_on_clicked")
 		bound_electrons.push_back(new_el)
 
-func _process(_dt):
-	pass
-	
+func _process(dt):
+	if state == State.IDLE:
+		var dphi = dt * speed / radius
+		rotate_object_local(Vector3(0, 1, 0), dphi)
+
 func _on_clicked(from_electron):
 	state = State.SELECTED
 	select_electron(from_electron)
@@ -78,15 +79,9 @@ func deselect_electron():
 		selected_electron.toggle_outline(false)
 
 func highlight():
-	for electron in bound_electrons:
-		electron.speed = 0
-		
 	$Shell.visible = false
 	$SelectedShell.visible = true
 	
 func dehighlight():
-	for electron in bound_electrons:
-		electron.speed = electron.orbit_speed
-		
 	$Shell.visible = true
 	$SelectedShell.visible = false
