@@ -1,12 +1,13 @@
 extends Spatial
 
 var structure_path = "res://data/structure/iodine.dat"
-var farfield = 100
-
-onready var Orbit = preload("res://scenes/Shell.tscn")
-
 var selected_shell
 var displayed_shell
+var photon_energy = 2000
+var electron_size = 0.6
+
+onready var Orbit = preload("res://scenes/Shell.tscn")
+onready var Electron = preload("res://scenes/Electron.tscn")
 
 func new_orbit(data):
 	var Etot = -float(data[3])
@@ -14,6 +15,7 @@ func new_orbit(data):
 	var Epot = Etot + Ekin
 	
 	var orbit = Orbit.instance()
+	orbit.electron_size = electron_size
 	orbit.shell = data[0]
 	orbit.n_el = int(data[1])
 	orbit.radius = log(1 + 7e4 / Epot)
@@ -66,7 +68,19 @@ func toggle_shell_display(shell, toggle):
 
 func _on_shoot_button_pressed():
 	var target = selected_shell.selected_electron.translation
-	
 	$Photon.translation = selected_shell.to_global(target)
 	$Photon/AnimationPlayer.play("Shoot")
-	
+
+func _on_photon_animation_finished(anim_name):
+	if anim_name == "Shoot":
+		var shot_electron = selected_shell.selected_electron
+		var pos = selected_shell.to_global(shot_electron.translation)
+		shot_electron.visible = false
+		
+		var photoelectron = Electron.instance()
+		photoelectron.translation = pos
+		photoelectron.radius = electron_size
+		photoelectron.state = photoelectron.State.FREE
+		photoelectron.velocity = pos.normalized() * sqrt(photon_energy)
+		add_child(photoelectron)
+		

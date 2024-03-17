@@ -200,3 +200,4 @@ anims/RESET = SubResource( 3 )
 anims/Shoot = SubResource( 4 )
 
 [connection signal="pressed" from="Info/ShootButton" to="." method="_on_shoot_button_pressed"]
+[connection signal="animation_finished" from="Photon/AnimationPlayer" to="." method="_on_photon_animation_finished"]

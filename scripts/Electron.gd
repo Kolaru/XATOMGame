@@ -4,7 +4,6 @@ enum State {BOUND, FREE}
 
 var velocity = Vector3.ZERO
 var outlined = false
-var speed = 0.0
 var state = State.BOUND
 
 signal hovered(electron)

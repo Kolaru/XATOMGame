@@ -1,6 +1,6 @@
 extends Spatial
 
-export var hole_size = 0.8
+var hole_size = 0.8
 
 func _ready():
 	$CSGTorus.inner_radius = hole_size

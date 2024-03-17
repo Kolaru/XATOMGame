@@ -5,7 +5,7 @@ export var thickness = 0.1
 export var n_el = 2
 
 var rotation_axis = Vector3(0, 1, 0)
-var electron_size = 0.6
+var electron_size
 var bound_electrons = []
 var shell = "1s"
 var speed = 4
@@ -40,11 +40,11 @@ func _ready():
 			var electron = Electron.instance()
 			electron.translation = position
 			electron.radius = electron_size
-			add_child(electron)
 			electron.connect("hovered", self, "_on_hovered")
 			electron.connect("unhovered", self, "_on_unhovered")
 			electron.connect("clicked", self, "_on_clicked")
 			bound_electrons.push_back(electron)
+			add_child(electron)
 
 func _process(dt):
 	if state == State.IDLE:
