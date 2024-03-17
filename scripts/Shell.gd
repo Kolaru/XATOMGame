@@ -16,27 +16,35 @@ var selected_electron
 
 onready var Electron = preload("res://scenes/Electron.tscn")
 onready var Hole = preload("res://scenes/Hole.tscn")
+onready var subshell = shell[1]
 
 signal toggle_selection(shell, toggle)
 signal toggle_highlight(shell, toggle)
+
+const subshell_sizes = {"s": 2, "p": 6, "d": 10, "f": 14}
 
 func _ready():
 	$Shell.radius = radius
 	$SelectedShell.radius = radius
 	
-	for el in range(n_el):
-		var phi = el * 2*PI / n_el
-		var new_el = Electron.instance()
+	for el in range(subshell_sizes[subshell]):
+		var phi = el * 2*PI / subshell_sizes[subshell]
+		var position = radius * Vector3(cos(phi), 0, sin(phi))
+		var hole = Hole.instance()
+		hole.translation = position
+		hole.hole_size = electron_size
+		hole.rotation = Vector3(0, -phi, 0)
+		add_child(hole)
 		
-		# new_el.translation = Vector3(radius, 0, 0).rotated(rotation_axis, phi)
-		new_el.translation = radius * Vector3(cos(phi), 0, sin(phi))
-		new_el.radius = electron_size
-		add_child(new_el)
-		
-		new_el.connect("hovered", self, "_on_hovered")
-		new_el.connect("unhovered", self, "_on_unhovered")
-		new_el.connect("clicked", self, "_on_clicked")
-		bound_electrons.push_back(new_el)
+		if el < n_el:
+			var electron = Electron.instance()
+			electron.translation = position
+			electron.radius = electron_size
+			add_child(electron)
+			electron.connect("hovered", self, "_on_hovered")
+			electron.connect("unhovered", self, "_on_unhovered")
+			electron.connect("clicked", self, "_on_clicked")
+			bound_electrons.push_back(electron)
 
 func _process(dt):
 	if state == State.IDLE:
