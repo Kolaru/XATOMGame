@@ -1,13 +1,23 @@
 extends Spatial
 
+var photon_energy = 2000
 var structure_path = "res://data/structure/iodine.dat"
+
 var selected_shell
 var displayed_shell
-var photon_energy = 2000
-var electron_size = 0.6
+var shells = {}
 
 onready var Orbit = preload("res://scenes/Shell.tscn")
 onready var Electron = preload("res://scenes/Electron.tscn")
+onready var Ionization = preload("res://scenes/Ionization.tscn")
+
+func _ready():
+	var structure_file = File.new()
+	structure_file.open(structure_path, File.READ)
+	
+	while structure_file.get_position() < structure_file.get_len():
+		var line = structure_file.get_csv_line()
+		new_orbit(line)
 
 func new_orbit(data):
 	var Etot = -float(data[3])
@@ -15,7 +25,7 @@ func new_orbit(data):
 	var Epot = Etot + Ekin
 	
 	var orbit = Orbit.instance()
-	orbit.electron_size = electron_size
+	shells[data[0]] = orbit
 	orbit.shell = data[0]
 	orbit.n_el = int(data[1])
 	orbit.radius = log(1 + 7e4 / Epot)
@@ -35,14 +45,6 @@ func new_orbit(data):
 	
 	orbit.connect("toggle_selection", self, "toggle_shell_selection")
 	orbit.connect("toggle_highlight", self, "toggle_shell_display")
-
-func _ready():
-	var structure_file = File.new()
-	structure_file.open(structure_path, File.READ)
-	
-	while structure_file.get_position() < structure_file.get_len():
-		var line = structure_file.get_csv_line()
-		new_orbit(line)
 
 func toggle_shell_selection(shell, toggle):
 	if toggle:
@@ -67,20 +69,20 @@ func toggle_shell_display(shell, toggle):
 		$Info/ShootButton.visible = true
 
 func _on_shoot_button_pressed():
-	var target = selected_shell.selected_electron.translation
-	$Photon.translation = selected_shell.to_global(target)
-	$Photon/AnimationPlayer.play("Shoot")
+	var target_electron = selected_shell.selected_electron
+	var target = selected_shell.to_global(target_electron.translation)
+	$Photon.shoot($PhotonSource.translation, target)
 
 func _on_photon_animation_finished(anim_name):
 	if anim_name == "Shoot":
-		var shot_electron = selected_shell.selected_electron
-		var pos = selected_shell.to_global(shot_electron.translation)
-		shot_electron.visible = false
-		
-		var photoelectron = Electron.instance()
-		photoelectron.translation = pos
-		photoelectron.radius = electron_size
-		photoelectron.state = photoelectron.State.FREE
-		photoelectron.velocity = pos.normalized() * sqrt(photon_energy)
-		add_child(photoelectron)
-		
+		var ionization = Ionization.instance()
+		ionization.photon_energy = photon_energy
+		ionization.original = selected_shell.selected_electron
+		add_child(ionization)
+
+func _on_test_button_pressed():
+	$Auger.visible = true
+	$Auger.decaying = shells["5p"].bound_electrons[0]
+	$Auger.hole = shells["3p"].bound_electrons[0]
+	$Auger.emitted = shells["3p"].bound_electrons[0]
+	$Auger.start()

@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://scenes/Electron.tscn" type="PackedScene" id=1]
+[ext_resource path="res://scripts/Ionization.gd" type="Script" id=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+render_mode unshaded, cull_front;
+
+uniform bool enable = true; // on and off switsch to diesable/enable the outline
+// outline costumization
+uniform float outline_thickness = 0.05; // how thick is the outline?
+uniform vec4 color : hint_color = vec4(0.0); // which color does the outline have?
+
+
+void vertex() {
+	if (enable) {
+	VERTEX += NORMAL*outline_thickness; // apply the outlines thickness	
+	}
+}
+
+void fragment() {
+	if (enable) {
+	ALBEDO = color.rgb; // apply the outlines color
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+resource_local_to_scene = true
+shader = SubResource( 1 )
+shader_param/enable = false
+shader_param/outline_thickness = 0.15
+shader_param/color = Color( 1, 1, 1, 1 )
+
+[sub_resource type="SpatialMaterial" id=3]
+resource_local_to_scene = true
+next_pass = SubResource( 2 )
+albedo_color = Color( 0.454902, 0.917647, 0.964706, 1 )
+
+[node name="Ejection" type="Spatial"]
+script = ExtResource( 2 )
+
+[node name="Electron" parent="." instance=ExtResource( 1 )]
+material = SubResource( 3 )
+state = 1

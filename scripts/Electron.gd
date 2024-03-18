@@ -1,17 +1,18 @@
 extends CSGSphere
 
-enum State {BOUND, FREE}
+enum State {BOUND, FREE, DECAYING}
 
 var velocity = Vector3.ZERO
 var outlined = false
-var state = State.BOUND
+export(State) var state = State.BOUND
 
 signal hovered(electron)
 signal unhovered(electron)
 signal clicked(electron)
 
 func _ready():
-	$Area/Shape.shape.radius = 2*radius
+	radius = Globals.electron_radius
+	$Area/Shape.shape.radius = Globals.electron_radius
 
 func _process(dt):
 	if state == State.FREE:

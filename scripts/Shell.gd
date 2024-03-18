@@ -32,19 +32,20 @@ func _ready():
 		var position = radius * Vector3(cos(phi), 0, sin(phi))
 		var hole = Hole.instance()
 		hole.translation = position
-		hole.hole_size = electron_size
 		hole.rotation = Vector3(0, -phi, 0)
 		add_child(hole)
 		
-		if el < n_el:
-			var electron = Electron.instance()
-			electron.translation = position
-			electron.radius = electron_size
-			electron.connect("hovered", self, "_on_hovered")
-			electron.connect("unhovered", self, "_on_unhovered")
-			electron.connect("clicked", self, "_on_clicked")
+		var electron = Electron.instance()
+		electron.translation = position
+		electron.connect("hovered", self, "_on_hovered")
+		electron.connect("unhovered", self, "_on_unhovered")
+		electron.connect("clicked", self, "_on_clicked")
+		add_child(electron)
+		
+		if el >= n_el:
+			electron.visible = false
+		else:
 			bound_electrons.push_back(electron)
-			add_child(electron)
 
 func _process(dt):
 	if state == State.IDLE:
