@@ -8,8 +8,9 @@ func shoot(origin, destination):
 	$Photon.look_at(destination, Vector3.UP)
 	
 	var time = (destination - origin).length() / speed
-	var tween = get_tree().create_tween()
-	tween.tween_property($Photon, "translation", destination, time)
+	$Tween.interpolate_property($Photon, "translation", null, destination, time)
+	$Tween.start()
+	
 	$AnimationPlayer.play("Emitted")
 	$AbsorbtionTimer.wait_time = time - absorbtion_time
 	$AbsorbtionTimer.start()

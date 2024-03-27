@@ -16,8 +16,8 @@ func start():
 	$Decaying.translation = origin
 	$Decaying.velocity = origin.normalized() * sqrt(auger_energy)
 	
-	var tween = get_tree().create_tween()
-	tween.tween_property($Decaying, "translation", destination, 1)
+	$Tween.interpolate_property($Decaying, "translation", null, destination, 1)
+	$Tween.start()
 	
 	$Photon.shoot(origin, photon_target)
 

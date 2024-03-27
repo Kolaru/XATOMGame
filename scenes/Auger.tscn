@@ -53,3 +53,5 @@ material = SubResource( 3 )
 state = 1
 
 [node name="Photon" parent="." instance=ExtResource( 3 )]
+
+[node name="Tween" type="Tween" parent="."]
