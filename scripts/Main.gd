@@ -83,6 +83,17 @@ func _on_photon_animation_finished(anim_name):
 func _on_test_button_pressed():
 	$Auger.visible = true
 	$Auger.decaying = shells["5p"].bound_electrons[0]
-	$Auger.hole = shells["3p"].bound_electrons[0]
+	$Auger.hole = shells["1s"].bound_electrons[0]
 	$Auger.emitted = shells["3p"].bound_electrons[0]
 	$Auger.start()
+
+func _on_photon_absorbed(photon):
+	var emitted = Electron.instance()
+	var target_electron = selected_shell.selected_electron
+	var target = selected_shell.to_global(target_electron.translation)
+	emitted.translation = target
+	add_child(emitted)
+	
+	target_electron.visible = false
+	emitted.eject_electron(photon_energy)
+	

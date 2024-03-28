@@ -55,3 +55,4 @@ state = 1
 [node name="Photon" parent="." instance=ExtResource( 3 )]
 
 [node name="Tween" type="Tween" parent="."]
+[connection signal="absorbed" from="Photon" to="." method="_on_photon_absorbed"]

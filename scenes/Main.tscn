@@ -74,3 +74,4 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -20.7788, 3.55778, 21.7918 )
 visible = false
 [connection signal="pressed" from="Info/ShootButton" to="." method="_on_shoot_button_pressed"]
 [connection signal="pressed" from="Info/TestButton" to="." method="_on_test_button_pressed"]
+[connection signal="absorbed" from="Photon" to="." method="_on_photon_absorbed"]

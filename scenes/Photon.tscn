@@ -249,4 +249,5 @@ light_color = Color( 0.996078, 0.658824, 1, 1 )
 light_energy = 0.0
 light_cull_mask = 4294967293
 omni_range = 200.0
+[connection signal="tween_all_completed" from="Tween" to="." method="_on_absorbtion_completed"]
 [connection signal="timeout" from="AbsorbtionTimer" to="." method="_on_absorbtion_timer_timeout"]

@@ -15,11 +15,14 @@ func start():
 	
 	$Decaying.translation = origin
 	$Decaying.velocity = origin.normalized() * sqrt(auger_energy)
+	$Emitted.reset_electron(photon_target)
 	
+	$Tween.remove_all()
 	$Tween.interpolate_property($Decaying, "translation", null, destination, 1)
 	$Tween.start()
 	
 	$Photon.shoot(origin, photon_target)
 
-func eject_auger():
-	pass
+func _on_photon_absorbed(photon):
+	emitted.visible = false
+	$Emitted.eject_electron(auger_energy)
